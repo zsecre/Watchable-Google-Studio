@@ -18,6 +18,16 @@ data class Media(
     val timestamp: Long = System.currentTimeMillis()
 )
 
+@Entity(tableName = "history")
+data class History(
+    @PrimaryKey val id: String,
+    val mediaId: String,
+    val title: String,
+    val posterPath: String?,
+    val type: MediaType,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
 enum class MediaType {
     MOVIE, TV, ANIME
 }

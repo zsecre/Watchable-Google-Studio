@@ -8,9 +8,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +26,10 @@ fun DetailScreen(
     onBack: () -> Unit
 ) {
     val isInWatchlist by viewModel.isInWatchlist(media.id).collectAsState(initial = false)
+
+    LaunchedEffect(media.id) {
+        viewModel.addToHistory(media)
+    }
 
     Scaffold(
         topBar = {

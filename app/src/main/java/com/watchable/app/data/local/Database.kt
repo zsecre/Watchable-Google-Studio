@@ -1,6 +1,7 @@
 package com.watchable.app.data.local
 
 import androidx.room.*
+import com.watchable.app.data.model.History
 import com.watchable.app.data.model.Media
 import com.watchable.app.data.model.MediaType
 import kotlinx.coroutines.flow.Flow
@@ -23,10 +24,23 @@ interface MediaDao {
     suspend fun getMediaById(id: String): Media?
 }
 
-@Database(entities = [Media::class], version = 1, exportSchema = false)
+@Dao
+interface HistoryDao {
+    @Query("SELECT * FROM history ORDER BY timestamp DESC LIMIT 50")
+    fun getHistory(): Flow<List<History>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertHistory(history: History)
+
+    @Query("DELETE FROM history WHERE mediaId = :mediaId")
+    suspend fun deleteHistoryByMediaId(mediaId: String)
+}
+
+@Database(entities = [Media::class, History::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class WatchableDatabase : RoomDatabase() {
-    abstract fun dao(): MediaDao
+    abstract fun mediaDao(): MediaDao
+    abstract fun historyDao(): HistoryDao
 }
 
 class Converters {

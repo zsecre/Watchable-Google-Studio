@@ -2,6 +2,7 @@ package com.watchable.app.data.repository
 
 import com.watchable.app.data.api.JikanApi
 import com.watchable.app.data.api.TmdbApi
+import com.watchable.app.data.local.HistoryDao
 import com.watchable.app.data.local.MediaDao
 import com.watchable.app.data.model.*
 import kotlinx.coroutines.flow.Flow
@@ -12,25 +13,44 @@ import javax.inject.Singleton
 class MediaRepository @Inject constructor(
     private val tmdbApi: TmdbApi,
     private val jikanApi: JikanApi,
-    private val dao: MediaDao
+    private val mediaDao: MediaDao,
+    private val historyDao: HistoryDao
 ) {
     // Watchlist
-    val watchlist = dao.getWatchlist()
+    val watchlist = mediaDao.getWatchlist()
 
     suspend fun toggleWatchlist(media: Media) {
-        val existing = dao.getMediaById(media.id)
+        val existing = mediaDao.getMediaById(media.id)
         if (existing != null) {
-            dao.deleteMedia(existing)
+            mediaDao.deleteMedia(existing)
         } else {
-            dao.insertMedia(media.copy(timestamp = System.currentTimeMillis()))
+            mediaDao.insertMedia(media.copy(timestamp = System.currentTimeMillis()))
         }
     }
 
-    fun isInWatchlist(id: String): Flow<Boolean> = dao.isInWatchlist(id)
+    fun isInWatchlist(id: String): Flow<Boolean> = mediaDao.isInWatchlist(id)
+
+    // History
+    val history = historyDao.getHistory()
+
+    suspend fun addToHistory(media: Media) {
+        historyDao.insertHistory(
+            History(
+                id = "hist_${media.id}",
+                mediaId = media.id,
+                title = media.title,
+                posterPath = media.posterPath,
+                type = media.type,
+                timestamp = System.currentTimeMillis()
+            )
+        )
+    }
 
     // TMDB
     suspend fun getTrendingMovies() = tmdbApi.getTrendingMovies().results.map { it.toMedia(MediaType.MOVIE) }
     suspend fun getPopularMovies() = tmdbApi.getPopularMovies().results.map { it.toMedia(MediaType.MOVIE) }
+    suspend fun getNowPlayingMovies() = tmdbApi.getTrendingMovies().results.map { it.toMedia(MediaType.MOVIE) } // Mocking for now or use specific endpoint if available
+
     suspend fun getTrendingTv() = tmdbApi.getTrendingTv().results.map { it.toMedia(MediaType.TV) }
     suspend fun getPopularTv() = tmdbApi.getPopularTv().results.map { it.toMedia(MediaType.TV) }
 

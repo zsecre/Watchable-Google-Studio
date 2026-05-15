@@ -3,18 +3,18 @@ package com.watchable.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
@@ -42,9 +42,11 @@ class MainActivity : ComponentActivity() {
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Home : Screen("home", "Home", Icons.Default.Home)
-    object Search : Screen("search", "Search", Icons.Default.Search)
+    object Movies : Screen("movies", "Movies", Icons.Default.PlayArrow)
+    object TvAnime : Screen("tvanime", "TV & Anime", Icons.Default.PlayArrow)
     object Library : Screen("library", "Library", Icons.Default.List)
     object Profile : Screen("profile", "Profile", Icons.Default.Person)
+    object Search : Screen("search", "Search", Icons.Default.Search)
     object Detail : Screen("detail/{mediaJson}", "Detail", Icons.Default.Home)
 }
 
@@ -58,15 +60,16 @@ fun MainLayout() {
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != Screen.Home.route && currentRoute != Screen.Search.route && currentRoute != Screen.Library.route && currentRoute != Screen.Profile.route) {
-                // Hide bottom bar on detail screen or others
-            } else {
-                NavigationBar {
-                    val items = listOf(Screen.Home, Screen.Search, Screen.Library, Screen.Profile)
-                    items.forEach { screen ->
+            val mainScreens = listOf(Screen.Home, Screen.Movies, Screen.TvAnime, Screen.Library, Screen.Profile)
+            if (currentRoute in mainScreens.map { it.route }) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    mainScreens.forEach { screen ->
                         NavigationBarItem(
                             icon = { Icon(screen.icon, contentDescription = screen.title) },
-                            label = { Text(screen.title) },
+                            label = { Text(screen.title, style = MaterialTheme.typography.labelSmall) },
                             selected = currentRoute == screen.route,
                             onClick = {
                                 navController.navigate(screen.route) {
@@ -76,7 +79,12 @@ fun MainLayout() {
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                            )
                         )
                     }
                 }
@@ -93,8 +101,13 @@ fun MainLayout() {
                     navigateToDetail(navController, media)
                 }
             }
-            composable(Screen.Search.route) {
-                SearchScreen(viewModel) { media ->
+            composable(Screen.Movies.route) {
+                MoviesScreen(viewModel) { media ->
+                    navigateToDetail(navController, media)
+                }
+            }
+            composable(Screen.TvAnime.route) {
+                TvAnimeScreen(viewModel) { media ->
                     navigateToDetail(navController, media)
                 }
             }
@@ -106,6 +119,11 @@ fun MainLayout() {
             composable(Screen.Profile.route) {
                 ProfileScreen(viewModel)
             }
+            composable(Screen.Search.route) {
+                SearchScreen(viewModel) { media ->
+                    navigateToDetail(navController, media)
+                }
+            }
             composable(
                 route = Screen.Detail.route,
                 arguments = listOf(navArgument("mediaJson") { type = NavType.StringType })
@@ -115,6 +133,22 @@ fun MainLayout() {
                 val media = Gson().fromJson(decodedJson, Media::class.java)
                 DetailScreen(media, viewModel) {
                     navController.popBackStack()
+                }
+            }
+        }
+        
+        // Overlay Search icon on Home
+        if (currentRoute == Screen.Home.route) {
+            Box(modifier = Modifier.padding(padding)) {
+                SmallFloatingActionButton(
+                    onClick = { navController.navigate(Screen.Search.route) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.Black
+                ) {
+                    Icon(Icons.Default.Search, contentDescription = "Search")
                 }
             }
         }

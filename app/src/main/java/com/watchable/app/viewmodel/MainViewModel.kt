@@ -25,13 +25,20 @@ class MainViewModel @Inject constructor(
     private val _trendingTv = MutableStateFlow<List<Media>>(emptyList())
     val trendingTv = _trendingTv.asStateFlow()
 
+    private val _popularTv = MutableStateFlow<List<Media>>(emptyList())
+    val popularTv = _popularTv.asStateFlow()
+
     private val _topAnime = MutableStateFlow<List<Media>>(emptyList())
     val topAnime = _topAnime.asStateFlow()
+
+    private val _nowPlayingAnime = MutableStateFlow<List<Media>>(emptyList())
+    val nowPlayingAnime = _nowPlayingAnime.asStateFlow()
 
     private val _searchResults = MutableStateFlow<List<Media>>(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
     val watchlist = repository.watchlist
+    val history = repository.history
 
     init {
         loadHomeData()
@@ -43,10 +50,18 @@ class MainViewModel @Inject constructor(
                 _trendingMovies.value = repository.getTrendingMovies()
                 _popularMovies.value = repository.getPopularMovies()
                 _trendingTv.value = repository.getTrendingTv()
+                _popularTv.value = repository.getPopularTv()
                 _topAnime.value = repository.getTopAnime()
+                _nowPlayingAnime.value = repository.getSeasonNow()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+
+    fun addToHistory(media: Media) {
+        viewModelScope.launch {
+            repository.addToHistory(media)
         }
     }
 

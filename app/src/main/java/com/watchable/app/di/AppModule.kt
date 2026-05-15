@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.watchable.app.BuildConfig
 import com.watchable.app.data.api.JikanApi
 import com.watchable.app.data.api.TmdbApi
+import com.watchable.app.data.local.HistoryDao
 import com.watchable.app.data.local.MediaDao
 import com.watchable.app.data.local.WatchableDatabase
 import dagger.Module
@@ -61,9 +62,14 @@ object AppModule {
             context,
             WatchableDatabase::class.java,
             "watchable.db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration() // Added for easy development
+            .build()
     }
 
     @Provides
-    fun provideDao(db: WatchableDatabase): MediaDao = db.dao()
+    fun provideMediaDao(db: WatchableDatabase): MediaDao = db.mediaDao()
+
+    @Provides
+    fun provideHistoryDao(db: WatchableDatabase): HistoryDao = db.historyDao()
 }
