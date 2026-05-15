@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -43,6 +44,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Home : Screen("home", "Home", Icons.Default.Home)
     object Search : Screen("search", "Search", Icons.Default.Search)
     object Library : Screen("library", "Library", Icons.Default.List)
+    object Profile : Screen("profile", "Profile", Icons.Default.Person)
     object Detail : Screen("detail/{mediaJson}", "Detail", Icons.Default.Home)
 }
 
@@ -56,11 +58,11 @@ fun MainLayout() {
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != Screen.Home.route && currentRoute != Screen.Search.route && currentRoute != Screen.Library.route) {
+            if (currentRoute != Screen.Home.route && currentRoute != Screen.Search.route && currentRoute != Screen.Library.route && currentRoute != Screen.Profile.route) {
                 // Hide bottom bar on detail screen or others
             } else {
                 NavigationBar {
-                    val items = listOf(Screen.Home, Screen.Search, Screen.Library)
+                    val items = listOf(Screen.Home, Screen.Search, Screen.Library, Screen.Profile)
                     items.forEach { screen ->
                         NavigationBarItem(
                             icon = { Icon(screen.icon, contentDescription = screen.title) },
@@ -100,6 +102,9 @@ fun MainLayout() {
                 LibraryScreen(viewModel) { media ->
                     navigateToDetail(navController, media)
                 }
+            }
+            composable(Screen.Profile.route) {
+                ProfileScreen(viewModel)
             }
             composable(
                 route = Screen.Detail.route,

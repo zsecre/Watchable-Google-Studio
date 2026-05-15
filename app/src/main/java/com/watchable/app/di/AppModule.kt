@@ -2,6 +2,7 @@ package com.watchable.app.di
 
 import android.content.Context
 import androidx.room.Room
+import com.watchable.app.BuildConfig
 import com.watchable.app.data.api.JikanApi
 import com.watchable.app.data.api.TmdbApi
 import com.watchable.app.data.local.MediaDao
@@ -29,7 +30,7 @@ object AppModule {
             .addInterceptor(logging)
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
-                    .addHeader("Authorization", "Bearer YOUR_TMDB_TOKEN") // User should replace this
+                    .addHeader("Authorization", "Bearer ${BuildConfig.TMDB_TOKEN}")
                     .build()
                 chain.proceed(request)
             }
