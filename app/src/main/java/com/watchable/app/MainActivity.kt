@@ -42,8 +42,8 @@ class MainActivity : ComponentActivity() {
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Home : Screen("home", "Home", Icons.Default.Home)
-    object Movies : Screen("movies", "Movies", Icons.Default.PlayArrow)
-    object TvAnime : Screen("tvanime", "TV & Anime", Icons.Default.PlayArrow)
+    object Movies : Screen("movies", "Movies", Icons.Default.Movie)
+    object TvAnime : Screen("tvanime", "TV & Anime", Icons.Default.Tv)
     object Library : Screen("library", "Library", Icons.Default.List)
     object Profile : Screen("profile", "Profile", Icons.Default.Person)
     object Search : Screen("search", "Search", Icons.Default.Search)
