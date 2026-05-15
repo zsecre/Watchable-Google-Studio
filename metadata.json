@@ -1,0 +1,6 @@
+{
+  "name": "Kotlin Mobile App",
+  "description": "A Kotlin Android application built with Jetpack Compose, featuring a GitHub Actions CI/CD pipeline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

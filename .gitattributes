@@ -1,0 +1,15 @@
+# Handle line endings
+* text=auto
+
+# Ensure Gradle wrapper and other binaries are treated as binary
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+
+# Specific Gradle files
+gradlew text eol=lf
+gradlew.bat text eol=crlf

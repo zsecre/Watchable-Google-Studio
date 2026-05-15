@@ -1,0 +1,18 @@
+# Android
+.gradle/
+build/
+app/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Web Legacy
+node_modules/
+dist/
+coverage/
+
+# Misc
+*.log
+.env*
+!.env.example
